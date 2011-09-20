@@ -83,7 +83,3 @@ int identd(int sock) {
 
 		return 0;
 }
-
-
-
-
