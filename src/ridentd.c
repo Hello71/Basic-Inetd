@@ -1,7 +1,6 @@
 #include <unistd.h>
 #include <netinet/ip.h>
 #include "include/printv.h"
-#include "include/help.h"
 #include "include/getopts.h"
 
 int debug = 1;
@@ -18,11 +17,6 @@ int main(int argc, char* argv[]) {
 		struct sockaddr_in bindaddr;
 		if (debug) {
 				verboseflag = 1;
-		}
-
-		if (argc > 1 && (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-?") == 0 || strcmp(argv[1], "-h") == 0)) {
-				printv("Showing help text");
-				help();
 		}
 
 		options = getopts(argc, argv);

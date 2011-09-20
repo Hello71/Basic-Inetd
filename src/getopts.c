@@ -11,30 +11,44 @@ struct args getopts(int argc, char* argv[]) {
 				retval.noroot = 0;
 				retval.bindaddr.sin_port = htons(113);
 				retval.bindaddr.sin_family = AF_INET;
-		printv("Initialized retval");
+				retval.bindaddr.sin_addr.s_addr = INADDR_ANY;
 		if (argc == 1) {
 				printv("getopt() returning early; argc < 2");
 				retval.bindaddr.sin_addr.s_addr = INADDR_ANY;
 				return retval;
 		}
-		ip = "0.0.0.0";
-		while ((c = getopt (argc, argv, "vdni:p:fr:c")) != -1) {
+		while (1) {
+				struct option long_options[] = {
+						{"verbose", no_argument, &(retval.verbose), 1},
+						{"daemon", no_argument, &(retval.daemonize), 1},
+						{"no-daemon", no_argument, &(retval.daemonize), 0},
+						{"no-root", no_argument, &(retval.noroot), 1},
+						{"force", no_argument, &(retval.force), 1},
+						{"help", no_argument, 0, 'h'},
+						{"bind-ip", required_argument, 0, 'i'},
+						{"bind-port", required_argument, 0, 'p'},
+						{"recv-ip", required_argument, 0, 'r'},
+						{0, 0, 0, 0}
+				};
+				int option_index = 0;
+
+				c = getopt_long(argc, argv, "vdnufi:p:r:", long_options, &option_index);
+
+				if (c == -1) break;
+
 				switch (c) {
-						case 'v':
-								printv("Enabling verbose output");
-								retval.verbose = 1;
-								break;
-						case 'd':
-								printv("Daemonizing");
-								retval.daemonize = 1;
-								break;
-						case 'n':
-								printv("Not daemonizing");
-								retval.daemonize = 0;
-								break;
+						case 'h':
+								help();
 						case 'i':
-								vprintv("Setting listening IP to %s\n", optarg);
-								ip = optarg;
+								if (strcmp(ip, "0.0.0.0") == 0) {
+										retval.bindaddr.sin_addr.s_addr = INADDR_ANY;
+								} else {
+										if (inet_aton(ip, &retval.bindaddr.sin_addr) == 0) {
+												printf("Invalid bind IP address\n");
+												exit(EXIT_FAILURE);
+										}
+								}
+
 								break;
 						case 'p':
 								errno = 0;
@@ -47,25 +61,13 @@ struct args getopts(int argc, char* argv[]) {
 										retval.bindaddr.sin_port = htons((int)tmpport);
 								}
 								break;
-						case 'f':
-								retval.noroot = 1;
-						case 'r':
-								
+
 						case '?':
-								if (c == 'i' || c == 'p') {
-										printf("Option -%c requires an argument.\n", optopt);
-								} else {
-										printf("Unknown option: %c\n", optopt);
-								}
+								printf("Try `%s --help' for more information.\n", argv[0]);
 								exit(EXIT_FAILURE);
-				}
-		}
-		if (strcmp(ip, "0.0.0.0") == 0) {
-				retval.bindaddr.sin_addr.s_addr = INADDR_ANY;
-		} else {
-				if (inet_aton(ip, &retval.bindaddr.sin_addr) == 0) {
-						printf("Invalid bind IP address\n");
-						exit(EXIT_FAILURE);
+
+						default:
+								abort();
 				}
 		}
 		return retval;
