@@ -9,7 +9,7 @@ struct args getopts(int argc, char* argv[]) {
 		memset(&(retval.bindaddr), 0, sizeof(struct sockaddr_in));
 				retval.daemonize = 1;
 				retval.noroot = 0;
-				retval.bindaddr.sin_port = 113;
+				retval.bindaddr.sin_port = htons(113);
 				retval.bindaddr.sin_family = AF_INET;
 		printv("Initialized retval");
 		if (argc == 1) {
@@ -44,7 +44,7 @@ struct args getopts(int argc, char* argv[]) {
 										exit(EXIT_FAILURE);
 								} else {
 										vprintv("Setting listening port to %d\n", (int)tmpport);
-										retval.bindaddr.sin_port = (int)tmpport;
+										retval.bindaddr.sin_port = htons((int)tmpport);
 								}
 								break;
 						case 'f':
