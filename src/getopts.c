@@ -55,7 +55,7 @@ struct args getopts(int argc, char* argv[]) {
 								if (c == 'i' || c == 'p') {
 										printf("Option -%c requires an argument.\n", optopt);
 								} else {
-										printf("%s %c", "Unknown option\n", optopt);
+										printf("Unknown option: %c\n", optopt);
 								}
 								exit(EXIT_FAILURE);
 				}
