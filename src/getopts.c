@@ -36,8 +36,14 @@ struct args getopts(int argc, char* argv[]) {
 				if (c == -1) break;
 
 				switch (c) {
+						case 0:
+								if (long_options[option_index].flag != 0) {
+										break;
+								}
+								break;
 						case 'h':
 								help();
+								break;
 						case 'i':
 								if (strcmp(optarg, "0.0.0.0") == 0) {
 										retval.bindaddr.sin_addr.s_addr = INADDR_ANY;
