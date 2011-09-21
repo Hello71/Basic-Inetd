@@ -1,12 +1,6 @@
 #include "include/printv.h"
 
-void printv(char* str) {
-	if (verboseflag) {
-		printf("%s", str);
-	}
-}
-
-void vprintv(char* format, ...) {
+void printv(char* format, ...) {
 	if (verboseflag) {
 		va_list args;
 		va_start(args, format);

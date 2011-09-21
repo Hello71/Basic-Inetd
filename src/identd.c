@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 			if (pid != 0) {
 				continue;
 			}
-			vprintv("Received connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
+			printv("Received connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
 			putsv("Reading until \\n is received");
 			char* buf[1];
 			while (1) {
