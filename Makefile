@@ -9,4 +9,4 @@ all:
 clean:
 	rm -v ${OUT}
 
-.PHONY: identd ridentd clean
+.PHONY: clean
