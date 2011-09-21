@@ -82,7 +82,6 @@ struct args getopts(int argc, char* argv[]) {
 					printf("Port cannot be over 65535 or under 1.");
 					exit(EXIT_FAILURE);
 				} else {
-					vprintv("Setting listening port to %d\n", (int)tmpport);
 					retval.bindaddr.sin_port = htons((int)tmpport);
 				}
 				break;
