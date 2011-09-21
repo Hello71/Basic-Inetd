@@ -2,7 +2,6 @@
 
 struct args getopts(int argc, char* argv[]) {
 		int c;
-		char* ip;
 		struct args retval;
 		printv("Parsing arguments");
 		memset(&retval, 0, sizeof(struct args));
@@ -40,11 +39,11 @@ struct args getopts(int argc, char* argv[]) {
 						case 'h':
 								help();
 						case 'i':
-								if (strcmp(ip, "0.0.0.0") == 0) {
+								if (strcmp(optarg, "0.0.0.0") == 0) {
 										retval.bindaddr.sin_addr.s_addr = INADDR_ANY;
 								} else {
-										if (inet_aton(ip, &retval.bindaddr.sin_addr) == 0) {
-												printf("Invalid bind IP address\n");
+										if (inet_aton(optarg, &retval.bindaddr.sin_addr) == 0) {
+												puts("Invalid bind IP address\n");
 												exit(EXIT_FAILURE);
 										}
 								}
@@ -52,7 +51,8 @@ struct args getopts(int argc, char* argv[]) {
 								break;
 						case 'p':
 								errno = 0;
-								long int tmpport = strtol(optarg, (char**)NULL, 10);
+								long int tmpport;
+								tmpport = strtol(optarg, (char**)NULL, 10);
 								if (errno || tmpport > 65535 || tmpport < 1) {
 										printf("Port cannot be over 65535 or under 1.");
 										exit(EXIT_FAILURE);
@@ -62,10 +62,22 @@ struct args getopts(int argc, char* argv[]) {
 								}
 								break;
 
+						case 'r':
+								if (strcmp(optarg, "0.0.0.0") == 0) {
+										retval.recvaddr.s_addr = INADDR_ANY;
+								} else {
+										if (inet_aton(optarg, &retval.recvaddr) == 0) {
+												puts("Invalid receive filter IP");
+												exit(EXIT_FAILURE);
+										}
+								}
+								break;
+
 						case '?':
 								printf("Try `%s --help' for more information.\n", argv[0]);
 								exit(EXIT_FAILURE);
-
+								break;
+								
 						default:
 								abort();
 				}

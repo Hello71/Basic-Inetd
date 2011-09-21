@@ -15,7 +15,7 @@ struct args {
 		int verbose;
 		int daemonize;
 		struct sockaddr_in bindaddr;
-		struct sockaddr_in recvaddr;
+		struct in_addr recvaddr;
 		int noroot;
 		int force;
 };
