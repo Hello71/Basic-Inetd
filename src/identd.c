@@ -5,75 +5,79 @@
 
 int debug = 1;
 
-int verboseflag = 0;
-
-struct args getopts(int argc, char* argv[]);
-void help();
-int identd(int sock);
+int verboseflag;
 
 int main(int argc, char* argv[]) {
-		struct args options;
-		int sock;
-		struct sockaddr_in bindaddr;
-		if (debug) {
-				verboseflag = 1;
+	struct args options;
+	int sock;
+	struct sockaddr_in bindaddr;
+
+	verboseflag = !debug;
+
+	options = getopts(argc, argv);
+
+	if (debug) options.daemonize = 0;
+
+	verboseflag = options.verbose || debug;
+
+	if (options.daemonize) {
+		int f;
+		f = fork();
+		if (f != -1) {
+			exit(EXIT_SUCCESS);
 		}
+	}
 
-		options = getopts(argc, argv);
+	sock = socket(PF_INET, SOCK_STREAM, 0);
+	if (sock == -1) {
+		perror("socket()");
+		exit(errno);
+	}
 
-		if (debug) options.daemonize = 0;
+	bindaddr = options.bindaddr;
+	if (bind(sock, (struct sockaddr*) &bindaddr, sizeof(struct sockaddr_in)) == -1) {
+		perror("bind()");
+		exit(errno);
+	}
 
-		if (options.verbose) {
-				verboseflag = 1;
-		}
+	listen(sock, 10);
 
-		if (options.daemonize) {
-				int f;
-				f = fork();
-				if (f != -1) {
-						exit(EXIT_SUCCESS);
+	while (1) {
+		struct sockaddr_in remoteaddr;
+		int remotesock;
+
+		unsigned int remoteaddrlen = sizeof(struct sockaddr_in);
+		putsv("accept()");
+		remotesock = accept(sock, (struct sockaddr *) &remoteaddr, &remoteaddrlen);
+		if (remotesock == -1) {
+			perror("accept()");
+			exit(errno);
+		} else {
+			if (memcmp(&remoteaddr.sin_addr, &(options.recvaddr), sizeof(struct in_addr)) != 0) {
+				printf("Unauthorized connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
+				if (!options.continu) {
+					exit(EXIT_SUCCESS);
 				}
-		}
-
-		sock = socket(PF_INET, SOCK_STREAM, 0);
-		if (sock == -1) {
-				perror("socket()");
-				exit(errno);
-		}
-
-		bindaddr = options.bindaddr;
-		if (bind(sock, (struct sockaddr*) &bindaddr, sizeof(struct sockaddr_in)) == -1) {
-				perror("bind()");
-				exit(errno);
-		}
-
-		listen(sock, 10);
-		return identd(sock);
-}
-
-int identd(int sock) {
-		while (1) {
-				struct sockaddr_in remoteaddr;
-				int remotesock;
-
-				unsigned int remoteaddrlen = sizeof(struct sockaddr_in);
-				printv("accept()");
-				remotesock = accept(sock, (struct sockaddr *) &remoteaddr, &remoteaddrlen);
-				if (remotesock == -1) {
-						perror("accept()");
-						exit(errno);
-				} else {
-						int pid = fork();
-						if (pid != 0) {
-								continue;
-						}
-						vprintv("Received connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
-						printv("Sending test string on socket");
-						send(remotesock, "Test", 4, 0);
-						printv("Closing remote socket");
-						close(remotesock);
+			}
+			int pid = fork();
+			if (pid != 0) {
+				continue;
+			}
+			vprintv("Received connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
+			putsv("Reading until \\n is received");
+			char* buf[1];
+			while (1) {
+				read(remotesock, &buf, 1);
+				if (strcmp((const char*) &buf, "\n") == 0) {
+					break;
 				}
+			}
+			putsv("Sending test message");
+			send(remotesock, "Test", 4, 0);
+			putsv("Sending EOF and closing remote socket");
+			close(remotesock);
 		}
+	}
 
-		return 0;
+	return 0;
 }

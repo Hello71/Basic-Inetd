@@ -12,12 +12,12 @@
 #include <arpa/inet.h>
 
 struct args {
-		int verbose;
-		int daemonize;
-		struct sockaddr_in bindaddr;
-		struct in_addr recvaddr;
-		int noroot;
-		int force;
+	int verbose;
+	int daemonize;
+	struct sockaddr_in bindaddr;
+	struct in_addr recvaddr;
+	int noroot;
+	int continu;
 };
 
 struct args getopts(int argc, char* argv[]);

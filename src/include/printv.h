@@ -6,6 +6,7 @@
 
 void printv(char* str);
 void vprintv(char* format, ...);
+void putsv(char* str);
 
 extern int verboseflag;
 
