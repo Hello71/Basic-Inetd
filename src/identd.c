@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (sock == -1) {
 		perror("socket()");
-		exit(errno);
+		exit(EXIT_FAILURE);
 	}
 
 	bindaddr = options.bindaddr;
@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 			putsv("Are you trying to bind to a port under 1024?\n"
 				"You may need to use `sudo' or similar.");
 		}
-		exit(errno);
+		exit(EXIT_FAILURE);
 	}
 
 	listen(sock, 10);
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 		remotesock = accept(sock, (struct sockaddr *) &remoteaddr, &remoteaddrlen);
 		if (remotesock == -1) {
 			perror("accept()");
-			exit(errno);
+			exit(EXIT_FAILURE);
 		} else {
 			if (memcmp(&remoteaddr.sin_addr, &(options.recvaddr), sizeof(struct in_addr)) != 0) {
 				printf("Unauthorized connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
@@ -87,7 +87,10 @@ int main(int argc, char* argv[]) {
 			putsv("Sending test message");
 			send(remotesock, "Test", 4, 0);
 			putsv("Sending EOF and closing remote socket");
-			close(remotesock);
+			if (close(remotesock) == -1) {
+				perror("close()");
+				exit(EXIT_FAILURE);
+			}
 		}
 	}
 
