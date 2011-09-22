@@ -1,6 +1,6 @@
 #include "include/help.h"
 void help() {
-	puts("Usage: identd [OPTION] [USER]"
+	puts("Usage: identd [OPTION] [USER]\n"
 		"Debug:\n"
 		"  -v, --verbose			Verbose\n"
 		"  -d, --daemon			Daemonize\n"
