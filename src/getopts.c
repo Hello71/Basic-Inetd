@@ -30,12 +30,12 @@ struct args getopts(int argc, char* argv[]) {
 			{"help", no_argument, 0, 'h'},
 			{"bind-ip", required_argument, 0, 'i'},
 			{"bind-port", required_argument, 0, 'p'},
-			{"recv-ip", required_argument, 0, 'r'},
+			{"remote-ip", required_argument, 0, 'r'},
 			{0, 0, 0, 0}
 		};
 		int option_index = 0;
 
-		c = getopt_long(argc, argv, "vdnfci:p:r:", long_options, &option_index);
+		c = getopt_long(argc, argv, "vdnuci:p:r:", long_options, &option_index);
 
 		if (c == -1) break;
 
@@ -54,7 +54,7 @@ struct args getopts(int argc, char* argv[]) {
 			case 'n':
 				retval.daemonize = 0;
 				break;
-			case 'f':
+			case 'u':
 				retval.noroot = 1;
 				break;
 			case 'c':

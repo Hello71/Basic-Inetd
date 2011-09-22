@@ -19,6 +19,14 @@ int main(int argc, char* argv[]) {
 	if (debug) options.daemonize = 0;
 
 	verboseflag = options.verbose || debug;
+	options.continu = options.continu || debug;
+
+	if (!options.noroot && ntohs(options.bindaddr.sin_port) < 1024 && geteuid() != 0) {
+		puts("Binding as non-root to port <1024\n"
+			"You may need to use `sudo' or similar.\n"
+			"To override this warning, use -u.");
+		exit(EXIT_FAILURE);
+	}
 
 	if (options.daemonize) {
 		int f;
@@ -37,6 +45,10 @@ int main(int argc, char* argv[]) {
 	bindaddr = options.bindaddr;
 	if (bind(sock, (struct sockaddr*) &bindaddr, sizeof(struct sockaddr_in)) == -1) {
 		perror("bind()");
+		if (errno == EACCES && geteuid() != 0) {
+			putsv("Are you trying to bind to a port under 1024?\n"
+				"You may need to use `sudo' or similar.");
+		}
 		exit(errno);
 	}
 
