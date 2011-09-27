@@ -3,7 +3,11 @@ SRC=src/*.c
 
 HARDENED_CFLAGS=${CFLAGS}
 HARDENED_CFLAGS+=$(HARDENING_CFLAGS)
-HARDENED_CFLAGS+=-O1 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -fstack-protector -pie -fPIE
+HARDENED_CFLAGS+=-O1 -D_FORTIFY_SOURCE=2
+# Requires -O1 or higher for -D_FORTIFY_SOURCE to take effect
+HARDENED_CFLAGS+=-Wformat -Wformat-security -Werror=format-security
+HARDENED_CFLAGS+=-fstack-protector --param ssp-buffer-size=4
+HARDENED_CFLAGS+=-pie -fPIE
 HARDENED_LDFLAGS=${LDFLAGS}
 HARDENED_LDFLAGS+=$(HARDENING_CFLAGS)
 HARDENED_LDFLAGS+=-Wl,-z,-relro,-z,now
