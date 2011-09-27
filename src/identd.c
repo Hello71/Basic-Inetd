@@ -79,7 +79,10 @@ int main(int argc, char* argv[]) {
 			putsv("Reading until \\n is received");
 			char* buf[1];
 			while (1) {
-				read(remotesock, &buf, 1);
+				if (read(remotesock, &buf, 1) == -1) {
+					printv("reading from socket connected to: %s:", inet_ntoa(remoteaddr.sin_addr));
+					perror("");
+				}
 				if (strcmp((const char*) &buf, "\n") == 0) {
 					break;
 				}
