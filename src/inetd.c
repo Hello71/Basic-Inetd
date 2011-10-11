@@ -41,14 +41,20 @@ int main(int argc, char* argv[]) {
         abort();
 	}
 
+    int one = 1;
+    if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(one), sizeof(int)) == -1) {
+        abort();
+    }
+
 	bindaddr = options.bindaddr;
 	if (bind(sock, (struct sockaddr*) &bindaddr, sizeof(struct sockaddr_in)) == -1) {
 		perror("bind()");
 		if (errno == EACCES && geteuid() != 0) {
 			puts("Are you trying to bind to a port under 1024?\n"
 				"You may need to use `sudo' or similar.");
+            exit(EXIT_FAILURE);
 		}
-		exit(EXIT_FAILURE);
+        abort();
 	}
 
 	listen(sock, 10);
@@ -56,14 +62,15 @@ int main(int argc, char* argv[]) {
 	while (1) {
 		struct sockaddr_in remoteaddr;
 		int remotesock;
+        unsigned int remoteaddrlen = sizeof (struct sockaddr_in);
 
-		unsigned int remoteaddrlen = sizeof(struct sockaddr_in);
+        unsigned int s_addr = options.recvaddr.s_addr;
 		remotesock = accept(sock, (struct sockaddr *) &remoteaddr, &remoteaddrlen);
 		if (remotesock == -1) {
 			perror("accept()");
             abort();
 		} else {
-			if (memcmp(&remoteaddr.sin_addr, &(options.recvaddr), sizeof(struct in_addr)) != 0) {
+            if (remoteaddr.sin_addr.s_addr != s_addr && s_addr != INADDR_ANY) {
 				printf("Unauthorized connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
 				if (!options.continu) {
 					exit(EXIT_SUCCESS);

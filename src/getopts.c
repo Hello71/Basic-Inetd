@@ -43,24 +43,31 @@ struct args getopts(int argc, char* argv[]) {
                     break;
                 }
                 break;
+
             case 'v':
                 retval.verbose = 1;
                 break;
+
             case 'd':
                 retval.daemonize = 1;
                 break;
+
             case 'n':
                 retval.daemonize = 0;
                 break;
+
             case 'u':
                 retval.noroot = 1;
                 break;
+
             case 'c':
                 retval.continu = 1;
                 break;
+
             case 'h':
                 help();
                 break;
+
             case 'i':
                 if (strcmp(optarg, "0.0.0.0") == 0) {
                     retval.bindaddr.sin_addr.s_addr = INADDR_ANY;
@@ -70,8 +77,8 @@ struct args getopts(int argc, char* argv[]) {
                         exit(EXIT_FAILURE);
                     }
                 }
-
                 break;
+
             case 'p':
                 errno = 0;
                 long int tmpport;
@@ -112,5 +119,4 @@ struct args getopts(int argc, char* argv[]) {
         }
     }
     return retval;
-    
 }
