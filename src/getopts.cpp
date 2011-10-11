@@ -111,7 +111,7 @@ struct args getopts(int argc, char* argv[]) {
                 abort();
         }
         if (optind < argc) {
-            retval.string = malloc(strlen(argv[optind]));
+            retval.string = (char*) malloc(strlen(argv[optind]));
             sprintf(retval.string, "%s", argv[optind]);
         } else {
             printf("You must provide a string to return.\n");

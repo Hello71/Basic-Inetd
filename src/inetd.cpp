@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <netinet/ip.h>
 #include "include/getopts.h"
+#include "include/inetd.h"
 
 int debug = 1;
 
