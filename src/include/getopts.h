@@ -11,12 +11,12 @@
 #include <arpa/inet.h>
 
 struct args {
-	int verbose;
-	int daemonize;
-	struct sockaddr_in bindaddr;
-	struct in_addr recvaddr;
-	int noroot;
-	int continu;
+    int verbose;
+    int daemonize;
+    struct sockaddr_in bindaddr;
+    struct in_addr recvaddr;
+    int noroot;
+    int continu;
     char* string;
 };
 
