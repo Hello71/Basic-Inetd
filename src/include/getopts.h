@@ -1,7 +1,6 @@
 #ifndef GETOPTS_GUARD
 #define GETOPTS_GUARD
 
-#include "printv.h"
 #include "help.h"
 #include <stdio.h>
 #include <getopt.h>
@@ -18,6 +17,7 @@ struct args {
 	struct in_addr recvaddr;
 	int noroot;
 	int continu;
+    char* string;
 };
 
 struct args getopts(int argc, char* argv[]);

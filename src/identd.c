@@ -1,6 +1,5 @@
 #include <unistd.h>
 #include <netinet/ip.h>
-#include "include/printv.h"
 #include "include/getopts.h"
 
 int debug = 1;
@@ -39,14 +38,14 @@ int main(int argc, char* argv[]) {
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 	if (sock == -1) {
 		perror("socket()");
-		exit(EXIT_FAILURE);
+        abort();
 	}
 
 	bindaddr = options.bindaddr;
 	if (bind(sock, (struct sockaddr*) &bindaddr, sizeof(struct sockaddr_in)) == -1) {
 		perror("bind()");
 		if (errno == EACCES && geteuid() != 0) {
-			putsv("Are you trying to bind to a port under 1024?\n"
+			puts("Are you trying to bind to a port under 1024?\n"
 				"You may need to use `sudo' or similar.");
 		}
 		exit(EXIT_FAILURE);
@@ -59,11 +58,10 @@ int main(int argc, char* argv[]) {
 		int remotesock;
 
 		unsigned int remoteaddrlen = sizeof(struct sockaddr_in);
-		putsv("accept()");
 		remotesock = accept(sock, (struct sockaddr *) &remoteaddr, &remoteaddrlen);
 		if (remotesock == -1) {
 			perror("accept()");
-			exit(EXIT_FAILURE);
+            abort();
 		} else {
 			if (memcmp(&remoteaddr.sin_addr, &(options.recvaddr), sizeof(struct in_addr)) != 0) {
 				printf("Unauthorized connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
@@ -75,25 +73,31 @@ int main(int argc, char* argv[]) {
 			if (pid != 0) {
 				continue;
 			}
-			printv("Received connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
-			putsv("Reading until \\n is received");
+			printf("Received connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
 			char* buf[1];
 			while (1) {
 				if (read(remotesock, &buf, 1) == -1) {
-					printv("reading from socket connected to: %s:", inet_ntoa(remoteaddr.sin_addr));
+					printf("error reading from socket connected to: %s:", inet_ntoa(remoteaddr.sin_addr));
 					perror("");
+                    if (!options.continu) {
+                        abort();
+                    }
 				}
 				if (strcmp((const char*) &buf, "\n") == 0) {
 					break;
 				}
 			}
-			putsv("Sending test message");
-			send(remotesock, "Test", 4, 0);
-			putsv("Sending EOF and closing remote socket");
-			if (close(remotesock) == -1) {
-				perror("close()");
-				exit(EXIT_FAILURE);
+			puts("Sending string");
+			send(remotesock, options.string, strlen(options.string), 0);
+			puts("Closing remote socket");
+			if (shutdown(remotesock, SHUT_RDWR) == -1) {
+				perror("shutdown()");
+                abort();
 			}
+            if (close(remotesock) == -1) {
+                perror("close()");
+                abort();
+            }
 		}
 	}
 
