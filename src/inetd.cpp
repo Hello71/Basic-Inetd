@@ -3,23 +3,14 @@
 #include "include/getopts.h"
 #include "include/inetd.h"
 
-int debug = 1;
-
-int verboseflag;
-
 int main(int argc, char* argv[]) {
     struct args options;
     int sock;
     struct sockaddr_in bindaddr;
 
-    verboseflag = !debug;
-
     options = getopts(argc, argv);
 
-    if (debug) options.daemonize = 0;
-
-    verboseflag = options.verbose || debug;
-    options.continu = options.continu || debug;
+    options.continu = options.continu;
 
     if (!options.noroot && ntohs(options.bindaddr.sin_port) < 1024 && geteuid() != 0) {
         puts("Binding as non-root to port <1024\n"
@@ -74,7 +65,7 @@ int main(int argc, char* argv[]) {
             if (remoteaddr.sin_addr.s_addr != s_addr && s_addr != INADDR_ANY) {
                 printf("Unauthorized connection from %s\n", inet_ntoa(remoteaddr.sin_addr));
                 if (!options.continu) {
-                    exit(EXIT_SUCCESS);
+                    exit(EXIT_FAILURE);
                 }
             }
             int pid = fork();

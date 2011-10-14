@@ -4,7 +4,6 @@ struct args getopts(int argc, char* argv[]) {
     int c;
     struct args retval;
     memset(&retval, 0, sizeof(struct args));
-        retval.verbose = 0;
         retval.daemonize = 1;
         retval.noroot = 0;
         retval.continu = 0;
@@ -20,7 +19,6 @@ struct args getopts(int argc, char* argv[]) {
     }
     while (1) {
         struct option long_options[] = {
-            {"verbose", no_argument, &(retval.verbose), 1},
             {"daemon", no_argument, &(retval.daemonize), 1},
             {"no-daemon", no_argument, &(retval.daemonize), 0},
             {"no-root", no_argument, &(retval.noroot), 1},
@@ -42,10 +40,6 @@ struct args getopts(int argc, char* argv[]) {
                 if (long_options[option_index].flag != 0) {
                     break;
                 }
-                break;
-
-            case 'v':
-                retval.verbose = 1;
                 break;
 
             case 'd':
